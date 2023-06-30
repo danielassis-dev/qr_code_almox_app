@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1043918316307",
+    "firebase_url": "https://qr-code-almox-app-default-rtdb.firebaseio.com",
+    "project_id": "qr-code-almox-app",
+    "storage_bucket": "qr-code-almox-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1043918316307:android:e2676b343ea0b43d5e30e6",
+        "android_client_info": {
+          "package_name": "com.example.qr_code_almox_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1043918316307-on503an08t9psej438tk33l69mi3h2i6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA9zamsLixTbzoRjUIbBlS7UJ3XCbbNrnQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1043918316307-on503an08t9psej438tk33l69mi3h2i6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
