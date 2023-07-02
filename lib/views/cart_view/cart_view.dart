@@ -1,7 +1,9 @@
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_code_almox_app/data/database/local_database.dart';
 import 'package:qr_code_almox_app/data/models/inventory_item.dart';
 import 'package:qr_code_almox_app/views/qr_read_view/qr_read_view.dart';
+import 'package:qr_code_almox_app/views/take_pictures_view/take_pictures_view.dart';
 import 'package:qr_code_almox_app/widgets/list_item_widget.dart';
 
 class CartView extends StatefulWidget {
@@ -101,7 +103,14 @@ class _CartViewState extends State<CartView> {
             child: Container(
               margin: const EdgeInsets.all(10),
               child: FilledButton(
-                onPressed: () {},
+                onPressed: () async {
+                  final cameras = await availableCameras();
+                  final cameraDescription = cameras.first;
+                  // TODO(danielassis-dev): fix use_build_context_synchronously
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => TakePicturesView(
+                          cameraDescription: cameraDescription)));
+                },
                 child: const Text("Emprestar!"),
               ),
             ),

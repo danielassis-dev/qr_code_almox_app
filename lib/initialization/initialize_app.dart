@@ -10,6 +10,7 @@ import '../data/models/app_user.dart';
 Future<void> initializeApp(BuildContext context) async {
   await loadLastUser(context);
   await Firebase.initializeApp();
+  // Ensure that plugin services are initialized so that `availableCameras()`
 }
 
 Future<void> loadLastUser(BuildContext context) async {
