@@ -41,7 +41,33 @@ class AppendPicturesView extends StatelessWidget {
                         onPressed: () {
                           final imageFiles =
                               context.read<ChangeNotifierFileList>();
-                          imageFiles.removeAt(index);
+                          // imageFiles.removeAt(index);
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: const Text('Foto do empréstimo'),
+                                content: Image.file(imageFiles[index]),
+                                actions: [
+                                  TextButton(
+                                      onPressed: () {
+                                        imageFiles.removeAt(index);
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text(
+                                        'Excluir Imagem',
+                                        style: TextStyle(color: Colors.red),
+                                      )),
+                                  FilledButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Text('Manter'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
                         },
                         style: ButtonStyle(
                             shape: MaterialStatePropertyAll<
