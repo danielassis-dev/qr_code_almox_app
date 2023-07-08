@@ -7,14 +7,9 @@ import 'package:qr_code_almox_app/views/login_view/login_view.dart';
 import '../../widgets/user_icon_button.dart';
 import '../pdf_view/pdf_view.dart';
 
-class HomeView extends StatefulWidget {
+class HomeView extends StatelessWidget {
   const HomeView({super.key});
 
-  @override
-  State<HomeView> createState() => _HomeViewState();
-}
-
-class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

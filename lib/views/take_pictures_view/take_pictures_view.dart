@@ -71,20 +71,13 @@ class _TakePicturesViewState extends State<TakePicturesView> {
 
             // Attempt to take a picture and get the file `image`
             // where it was saved.
+            // TODO(danielassis-dev): Check a way to exclude these images files after they are no loger being in use.
             final image = await _cameraController.takePicture();
 
             if (!mounted) return;
 
-            // If the picture was taken, display it on a new screen.
-            await Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => DisplayPictureScreen(
-                  // Pass the automatically generated path to
-                  // the DisplayPictureScreen widget.
-                  imagePath: image.path,
-                ),
-              ),
-            );
+            Navigator.of(context).pop<String>(image.path);
+            return;
           } catch (e) {
             // If an error occurs, log the error to the console.
             debugPrint(e.toString());

@@ -1,32 +1,36 @@
 import 'dart:io';
 
+import 'package:camera/camera.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:provider/provider.dart';
-
 import '../data/models/app_user.dart';
 
-Future<void> initializeApp(BuildContext context) async {
-  await loadLastUser(context);
+Future<Map<String, dynamic>> initializeApp() async {
+  // Load Last User. If there none is found, send a new empty logged-out user
+  final Map<String, dynamic> returnMap = {};
+  returnMap['lastUser'] = await loadLastUser();
+
   await Firebase.initializeApp();
-  // Ensure that plugin services are initialized so that `availableCameras()`
+
+  WidgetsFlutterBinding.ensureInitialized();
+  final List<CameraDescription> cameras = await availableCameras();
+  returnMap['availableCameras'] = cameras;
+
+  return returnMap;
 }
 
-Future<void> loadLastUser(BuildContext context) async {
-  final appUser = context.read<AppUser>();
-
+Future<AppUser> loadLastUser() async {
   final appDir = await getApplicationDocumentsDirectory();
   final usersDir = await Directory('${appDir.path}/users').create();
   final path = usersDir.path;
   final lastUserFile = File('$path/last_user.json');
 
-  if (!(await lastUserFile.exists())) return;
+  if (!(await lastUserFile.exists())) return AppUser();
 
   final jsonString = await lastUserFile.readAsString();
 
   final lastUser = AppUser.fromJson(jsonString);
-  appUser.isLogedInLocally = true;
-  appUser.name = lastUser.name;
-  appUser.uuid = lastUser.uuid;
+  lastUser.isLogedInLocally = true;
+  return lastUser;
 }

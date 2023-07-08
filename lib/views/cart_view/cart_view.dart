@@ -1,9 +1,11 @@
-import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:qr_code_almox_app/data/database/local_database.dart';
+import 'package:qr_code_almox_app/data/models/app_user.dart';
 import 'package:qr_code_almox_app/data/models/inventory_item.dart';
+import 'package:qr_code_almox_app/data/models/lending.dart';
+import 'package:qr_code_almox_app/views/append_pictures_view/append_pictures_view.dart';
 import 'package:qr_code_almox_app/views/qr_read_view/qr_read_view.dart';
-import 'package:qr_code_almox_app/views/take_pictures_view/take_pictures_view.dart';
 import 'package:qr_code_almox_app/widgets/list_item_widget.dart';
 
 class CartView extends StatefulWidget {
@@ -20,109 +22,111 @@ class _CartViewState extends State<CartView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Carrinho'),
-      ),
-      body: Column(
-        children: [
-          Center(
-            child: Container(
-              margin: const EdgeInsets.all(10),
-              child: Autocomplete<InventoryItem>(
-                optionsBuilder: (textEditingValue) =>
-                    LocalDatabase.searchFromString(textEditingValue.text),
-                displayStringForOption: (option) => option.toString(),
-                onSelected: (item) {
-                  insertItem(item);
-                  inputController?.clear();
-                  FocusScope.of(context).unfocus();
-                },
-                optionsViewBuilder: (context, onSelected, options) {
-                  final ScrollController scrollController = ScrollController();
-                  return Align(
-                    alignment: Alignment.topLeft,
-                    child: Container(
-                      margin: const EdgeInsets.all(20),
-                      child: Material(
-                        elevation: 4,
-                        child: SizedBox(
-                          height: 200,
-                          child: Scrollbar(
-                            thumbVisibility: true,
-                            controller: scrollController,
-                            child: ListView.builder(
-                              controller: scrollController,
-                              itemCount: options.length,
-                              itemBuilder: (context, index) {
-                                return FilledButton(
-                                  onPressed: () =>
-                                      onSelected(options.elementAt(index)),
-                                  child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Text(
-                                      options.elementAt(index).toString(),
-                                      style: const TextStyle(fontSize: 10),
-                                    ),
-                                  ),
-                                );
-                              },
+    return ChangeNotifierProvider(
+      create: (context) => Lending(appUser: context.watch<AppUser>()),
+      child: Builder(builder: (context) {
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('Carrinho'),
+          ),
+          body: Column(
+            children: [
+              Center(
+                child: Container(
+                  margin: const EdgeInsets.all(10),
+                  child: Autocomplete<InventoryItem>(
+                    optionsBuilder: (textEditingValue) =>
+                        LocalDatabase.searchFromString(textEditingValue.text),
+                    displayStringForOption: (option) => option.toString(),
+                    onSelected: (item) {
+                      insertItem(item);
+                      inputController?.clear();
+                      FocusScope.of(context).unfocus();
+                    },
+                    optionsViewBuilder: (context, onSelected, options) {
+                      final ScrollController scrollController =
+                          ScrollController();
+                      return Align(
+                        alignment: Alignment.topLeft,
+                        child: Container(
+                          margin: const EdgeInsets.all(20),
+                          child: Material(
+                            elevation: 4,
+                            child: SizedBox(
+                              height: 200,
+                              child: Scrollbar(
+                                thumbVisibility: true,
+                                controller: scrollController,
+                                child: ListView.builder(
+                                  controller: scrollController,
+                                  itemCount: options.length,
+                                  itemBuilder: (context, index) {
+                                    return FilledButton(
+                                      onPressed: () =>
+                                          onSelected(options.elementAt(index)),
+                                      child: Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Text(
+                                          options.elementAt(index).toString(),
+                                          style: const TextStyle(fontSize: 10),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
-                  );
-                },
-                fieldViewBuilder: (context, textEditingController, focusNode,
-                    onFieldSubmitted) {
-                  inputController = textEditingController;
-                  return TextField(
-                    controller: inputController,
-                    focusNode: focusNode,
-                    onTapOutside: (event) {
-                      FocusScope.of(context).unfocus();
+                      );
                     },
-                    decoration: const InputDecoration(
-                      labelText: "Procure uma ferramenta",
-                      hintText: "RRD_9999 - Alicate",
-                      border: OutlineInputBorder(),
-                    ),
-                  );
-                },
+                    fieldViewBuilder: (context, textEditingController,
+                        focusNode, onFieldSubmitted) {
+                      inputController = textEditingController;
+                      return TextField(
+                        controller: inputController,
+                        focusNode: focusNode,
+                        onTapOutside: (event) {
+                          FocusScope.of(context).unfocus();
+                        },
+                        decoration: const InputDecoration(
+                          labelText: "Procure uma ferramenta",
+                          hintText: "RRD_9999 - Alicate",
+                          border: OutlineInputBorder(),
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ),
-            ),
-          ),
-          Expanded(
-            child: AnimatedList(
-              key: listKey,
-              itemBuilder: _itemBuilder,
-            ),
-          ),
-          Center(
-            child: Container(
-              margin: const EdgeInsets.all(10),
-              child: FilledButton(
-                onPressed: () async {
-                  final cameras = await availableCameras();
-                  final cameraDescription = cameras.first;
-                  // TODO(danielassis-dev): fix use_build_context_synchronously
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => TakePicturesView(
-                          cameraDescription: cameraDescription)));
-                },
-                child: const Text("Emprestar!"),
+              Expanded(
+                child: AnimatedList(
+                  key: listKey,
+                  itemBuilder: _itemBuilder,
+                ),
               ),
-            ),
-          )
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          readQrCode();
-        },
-        child: const Icon(Icons.qr_code_scanner),
-      ),
+              Center(
+                child: Container(
+                  margin: const EdgeInsets.all(10),
+                  child: FilledButton(
+                    onPressed: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => const AppendPicturesView()));
+                    },
+                    child: const Text("Adicionar Fotos..."),
+                  ),
+                ),
+              )
+            ],
+          ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              readQrCode();
+            },
+            child: const Icon(Icons.qr_code_scanner),
+          ),
+        );
+      }),
     );
   }
 
@@ -132,6 +136,7 @@ class _CartViewState extends State<CartView> {
       MaterialPageRoute(builder: (context) => const QrReadView()),
     );
 
+    // ignore: use_build_context_synchronously
     if (!context.mounted) return;
 
     final code = data;
