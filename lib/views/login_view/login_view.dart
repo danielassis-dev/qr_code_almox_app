@@ -1,56 +1,15 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:qr_code_almox_app/data/models/app_user.dart';
+import 'package:qr_code_almox_app/data/managers/user_manager.dart';
 
 class LoginView extends StatelessWidget {
   LoginView({super.key});
 
   final nameController = TextEditingController();
 
-  Future<void> registerUser(BuildContext context, String name) async {
-    final appUser = context.read<AppUser>();
-
-    final appDir = await getApplicationDocumentsDirectory();
-    final usersDir = await Directory('${appDir.path}/users').create();
-    final path = usersDir.path;
-    final usersFile = File('$path/users.json');
-    final lastUserFile = File('$path/last_user.json');
-
-    List<AppUser> appUsers = [];
-
-    if (await usersFile.exists()) {
-      final jsonString = await usersFile.readAsString();
-      debugPrint(jsonString);
-      appUsers.addAll(List<AppUser>.from(
-          (json.decode(jsonString)).map((e) => AppUser.fromMap(e))));
-    }
-
-    appUser.name = name;
-    appUser.isLogedInLocally = true;
-
-    int userIndex =
-        appUsers.indexWhere((element) => element.name == appUser.name);
-    if (userIndex != -1) {
-      appUser.uuid = appUsers[userIndex].uuid;
-      appUsers[userIndex] = appUser;
-    } else {
-      appUsers.add(appUser);
-    }
-
-    debugPrint('Iniciando salvamento do usuario!');
-    await usersFile
-        .writeAsString(json.encode(appUsers.map((e) => e.toMap()).toList()));
-    await lastUserFile.writeAsString(appUser.toJson());
-    debugPrint(usersFile.path);
-    debugPrint('Salvo!');
-  }
-
   @override
   Widget build(BuildContext context) {
+    final userManager = context.read<UserManager>();
     return Scaffold(
         body: Container(
       padding: const EdgeInsets.all(32),
@@ -87,9 +46,22 @@ class LoginView extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: FilledButton(
-                onPressed: () {
-                  registerUser(context, nameController.text);
-                  Navigator.of(context).pop();
+                onPressed: () async {
+                  showDialog(
+                    barrierDismissible: false,
+                    context: context,
+                    builder: (context) => const AlertDialog(
+                      title: Text('Fazendo Login'),
+                      content: SizedBox(
+                        height: 100.0,
+                        width: 100.0,
+                        child: Center(child: CircularProgressIndicator()),
+                      ),
+                    ),
+                  );
+                  await userManager.login(nameController.text);
+                  if (context.mounted) Navigator.of(context).pop();
+                  if (context.mounted) Navigator.of(context).pop();
                 },
                 child: const Text("Login"),
               ),

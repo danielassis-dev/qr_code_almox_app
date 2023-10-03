@@ -1,12 +1,14 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
-import 'package:qr_code_almox_app/data/models/app_user.dart';
 
 class UserIconButton extends StatelessWidget {
-  final AppUser appUser;
+  final bool isLoggedIn;
+  final String? firstName;
   final void Function() onPressed;
 
   const UserIconButton({
-    required this.appUser,
+    required this.isLoggedIn,
+    this.firstName,
     required this.onPressed,
     super.key,
   });
@@ -15,10 +17,10 @@ class UserIconButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return FilledButton(
       onPressed: onPressed,
-      child: appUser.isLogedInLocally
+      child: isLoggedIn
           ? Row(
               children: [
-                Text('${appUser.firstName}'),
+                Text(firstName ?? 'USUÁRIO SEM NOME'),
                 const Icon(Icons.logout),
               ],
             )

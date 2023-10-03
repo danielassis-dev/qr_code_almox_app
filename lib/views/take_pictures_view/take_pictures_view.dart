@@ -45,45 +45,45 @@ class _TakePicturesViewState extends State<TakePicturesView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Tire uma foto')),
-      // You must wait until the controller is initialized before displaying the
-      // camera preview. Use a FutureBuilder to display a loading spinner until the
-      // controller has finished initializing.
-      body: FutureBuilder<void>(
-        future: _initializeControllerFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            // If the Future is complete, display the preview.
-            return CameraPreview(_cameraController);
-          } else {
-            // Otherwise, display a loading indicator.
-            return const Center(child: CircularProgressIndicator());
-          }
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        // Provide an onPressed callback.
-        onPressed: () async {
-          // Take the Picture in a try / catch block. If anything goes wrong,
-          // catch the error.
-          try {
-            // Ensure that the camera is initialized.
-            await _initializeControllerFuture;
+      body: Column(
+        children: [
+          Expanded(
+            child: FutureBuilder<void>(
+              future: _initializeControllerFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  return CameraPreview(_cameraController);
+                } else {
+                  return const Center(child: CircularProgressIndicator());
+                }
+              },
+            ),
+          ),
+          Center(
+            child: Container(
+              padding: const EdgeInsets.all(10.0),
+              child: SizedBox(
+                height: 70.0,
+                width: 70.0,
+                child: FilledButton(
+                    onPressed: () async {
+                      try {
+                        await _initializeControllerFuture;
+                        final image = await _cameraController.takePicture();
 
-            // Attempt to take a picture and get the file `image`
-            // where it was saved.
-            // TODO(danielassis-dev): Check a way to exclude these images files after they are no loger being in use.
-            final image = await _cameraController.takePicture();
+                        if (!mounted) return;
 
-            if (!mounted) return;
-
-            Navigator.of(context).pop<String>(image.path);
-            return;
-          } catch (e) {
-            // If an error occurs, log the error to the console.
-            debugPrint(e.toString());
-          }
-        },
-        child: const Icon(Icons.camera_alt),
+                        Navigator.of(context).pop<String>(image.path);
+                        return;
+                      } catch (e) {
+                        debugPrint(e.toString());
+                      }
+                    },
+                    child: const Icon(Icons.camera)),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

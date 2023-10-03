@@ -1,57 +1,39 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
-
-import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 
-class AppUser with ChangeNotifier {
-  String? _name;
+class AppUser {
+  String _name;
 
-  String? get name => _name;
+  String get name => _name;
 
-  String? get firstName => _name?.split(' ')[0];
+  String get firstName => name.split(' ')[0];
 
-  set name(String? value) {
-    _name = value?.trim();
-    notifyListeners();
+  set name(String value) {
+    _name = value.trim();
   }
 
-  String? _uuid;
+  String _uuid;
 
-  String? get uuid => _uuid;
+  String get uuid => _uuid;
 
-  set uuid(String? value) {
-    _uuid = value;
-    notifyListeners();
-  }
-
-  bool _isLogedInLocally = false;
-
-  bool get isLogedInLocally => _isLogedInLocally;
-
-  set isLogedInLocally(bool value) {
-    _isLogedInLocally = value;
-    notifyListeners();
-  }
-
-  AppUser({String? name, String? uuid})
-      : _uuid = uuid,
-        _name = name {
-    uuid = uuid ?? const Uuid().v1();
-  }
+  /// Creates an [AppUser] object. [uuid] must be provided unless its a new user.
+  /// If [uuid] is not provied one is created and assigned (used for new users).
+  AppUser({required String name, String? uuid})
+      : _uuid = uuid ?? const Uuid().v1(),
+        _name = name.trim();
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      'name': name,
-      'uuid': uuid,
-      'isLogedInLocally': isLogedInLocally,
+      'name': _name,
+      'uuid': _uuid,
     };
   }
 
   factory AppUser.fromMap(Map<String, dynamic> map) {
     return AppUser(
-      name: map['name'] != null ? map['name'] as String : null,
-      uuid: map['uuid'] != null ? map['uuid'] as String : null,
+      name: map['name'],
+      uuid: map['uuid'],
     );
   }
 
